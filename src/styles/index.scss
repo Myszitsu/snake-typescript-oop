@@ -1,0 +1,119 @@
+@use "global";
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	font-size: 62.5%;
+}
+
+body {
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	background-color: #ddd;
+	font-family: 'Exo 2', sans-serif;
+	background-image: linear-gradient(45deg, royalblue, greenyellow);
+}
+
+.frame {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(45deg, #222, #333);
+	border-radius: 5px;
+}
+
+.snake {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 15px;
+	width: 15px;
+	background-color: #fff;
+}
+.apple {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 15px;
+	width: 15px;
+	background-color: greenyellow;
+	box-shadow: inset 0 0 5px green;
+	border-radius: 2px;
+}
+
+.h1 {
+	text-align: center;
+	display: none;
+	font-size: 90px;
+	padding-inline: 20px;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.3);
+	z-index: 1;
+}
+
+.lost {
+	display: block;
+	color: red;
+	font-size: 100px;
+	font-weight: 700;
+}
+
+.win {
+	display: block;
+	font-size: 100px;
+	color: greenyellow;
+	font-weight: 300;
+}
+
+.score {
+	position: absolute;
+	margin: 0 auto;
+	text-transform: uppercase;
+	font-weight: 300;
+	top: 30px;
+	font-size: 20px;
+	color: #fff;
+}
+
+.span {
+	color: hsl(179, 80%, 50%);
+}
+
+.btn {
+	display: none;
+	position: absolute;
+	bottom: 30px;
+	margin: 0 auto;
+	padding: 15px 30px;
+	font-size: 20px;
+	font-family: 'Exo 2', sans-serif;
+	background: transparent;
+	color: rgba(255, 255, 255, 0.7);
+	border: 1px solid rgba(255, 255, 255, 0.7);
+	border-radius: 2px;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: background-color 0.3s;
+
+	&:hover {
+		background-color: rgba(255, 255, 255, 0.3);
+	}
+}
+
+.active {
+	display: block;
+}
+
+
