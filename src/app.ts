@@ -33,6 +33,10 @@ function movementHandler(event: KeyboardEvent | Event) {
 }
 
 window.addEventListener('keydown', movementHandler);
+window.addEventListener('resize', () => {
+   game.frame.setSize()
+   game.reset()
+})
 
 arrowButtons.forEach(button => {
 	button.addEventListener('click', movementHandler);
@@ -43,7 +47,9 @@ pause.addEventListener('click', () => {
 	game.movement.isMovementFinished = true;
 	game.movement.pause();
 });
-reset;
+reset.addEventListener('click', () => {
+   game.reset()
+})
 play.addEventListener('click', () => {
 	console.log('clicked');
 	if (game.movement.isMovementFinished) {

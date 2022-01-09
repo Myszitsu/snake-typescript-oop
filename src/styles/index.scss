@@ -118,9 +118,10 @@ body {
 }
 
 .wrapper {
+	display: grid;
+	place-items: center;
 	width: 80vw;
 	height: 80%;
-	background-color: blue;
 	display: grid;
 }
 
@@ -141,6 +142,12 @@ body {
 		i {
 			pointer-events: none;
 		}
+	}
+}
+
+.controls {
+	button {
+		padding: 10px 20px;
 	}
 }
 

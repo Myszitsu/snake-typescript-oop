@@ -26,7 +26,7 @@ class SnakeFrame {
 	}
 }
 
-class Snake {
+class SnakeBody {
 	head: HTMLDivElement = this.frameDiv.querySelector('#head') as HTMLDivElement;
 	body: HTMLDivElement[] = [this.head];
 	position = {
@@ -37,9 +37,20 @@ class Snake {
 		this.head.classList.add('snake');
 	}
 
+	reset() {
+		this.body.forEach((el, idx) => {
+			if (idx > 0) {
+				el.remove()
+			}
+		})
+		this.body = this.body.filter((_: HTMLDivElement, idx: number) => idx === 0)
+		this.setNewHeadPosition()
+		this.position = this.getPosition(this.head)
+	}
+
 	getPosition(bodyPart: HTMLDivElement) {
 		if (!bodyPart.style.transform && bodyPart === this.head) {
-			this.setNewPosition();
+			this.setNewHeadPosition();
 		}
 
 		return {
@@ -56,7 +67,7 @@ class Snake {
 		};
 	}
 
-	setNewPosition() {
+	setNewHeadPosition() {
 		this.head.style.transform = `translate(${this.frame.width / 2 - 15}px, ${
 			this.frame.height / 2 - 15
 		}px)`;
@@ -79,7 +90,7 @@ class Apple {
 	) as HTMLDivElement;
 	constructor(
 		public frame: SnakeFrame,
-		public snake: Snake,
+		public snake: SnakeBody,
 		public frameDiv: HTMLDivElement
 	) {
 		this.fruit.classList.add('apple');
@@ -99,16 +110,25 @@ class Apple {
 class SnakeMovement {
 	isMovementFinished = true;
 	direction: number = 1;
-	hasSwitchedSides = false;
 	interval: any;
 	eventIdentifier = 'ArrowRight'
 	status: string = ''
 
 	constructor(
 		public frame: SnakeFrame,
-		public snake: Snake,
+		public snake: SnakeBody,
 		public apple: Apple
 	) {}
+
+	reset() {
+		clearInterval(this.interval)
+		this.eventIdentifier = 'ArrowRight'
+		this.status = ''
+		this.direction = 1
+		setTimeout(() => {
+			this.isMovementFinished = true
+		}, 50);
+	}
 
 	pause() {
 		clearInterval(this.interval)
@@ -210,42 +230,40 @@ class SnakeMovement {
 		switch (true) {
 			case position.x === this.frame.width - 15 && this.direction > 0:
 				this.snake.position.x = 0;
-				switchSides();
-				this.hasSwitchedSides = true;
-				break;
+				switchSides();break;
 			case position.x === 0 && this.direction < 0:
 				this.snake.position.x = this.frame.width - 15;
-				switchSides();
-				this.hasSwitchedSides = true;
-				break;
+				switchSides();break;
 			case position.y === this.frame.height -15 && this.direction > 0:
 				this.snake.position.y = 0;
-				switchSides();
-				this.hasSwitchedSides = true;
-				break;
+				switchSides();break;
 			case position.y === 0 && this.direction < 0:
 				this.snake.position.y = this.frame.height - 15;
-				switchSides();
-				this.hasSwitchedSides = true;
-				break;
-			default:
-				this.hasSwitchedSides = false;
-				break;
+				switchSides();break;
 		}
 	}
 }
 
 export default class SnakeGame {
 	frame: SnakeFrame;
-	snake: Snake;
+	snake: SnakeBody;
 	apple: Apple;
 	movement: SnakeMovement;
 	constructor(public frameDiv: HTMLDivElement) {
 		this.frame = new SnakeFrame(this.frameDiv);
 		this.frame.setSize();
-		this.snake = new Snake(this.frame, frameDiv);
+		this.snake = new SnakeBody(this.frame, frameDiv);
 		this.apple = new Apple(this.frame, this.snake, frameDiv);
 		this.apple.setNewPosition();
 		this.movement = new SnakeMovement(this.frame, this.snake, this.apple);
+	}
+
+	reset() {
+		this.movement.reset()
+		setTimeout(() => {
+			this.snake.reset()
+			this.apple.setNewPosition()
+		}, 50);
+		
 	}
 }
