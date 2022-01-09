@@ -73,6 +73,7 @@ module.exports = {
 			// title: 'First Webpack Project',
 			filename: 'index.html',
 			template: path.resolve(__dirname, 'src/temp.html'),
+			scriptLoading: 'module'
 		}),
 		new MiniCssExtractPlugin({
 			filename: '[name].[contenthash].css',

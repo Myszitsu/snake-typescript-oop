@@ -2,23 +2,19 @@ class SnakeFrame {
 	width: number = 0;
 	height: number = 0;
 
-	constructor(public wrapper: HTMLDivElement, public frame: HTMLDivElement) {}
+	constructor(public frame: HTMLDivElement) {}
 
 	setWidth() {
 		this.width = 0;
-		const wWidth = this.wrapper.clientWidth;
-		while (this.width + 30 <= wWidth) {
+		while (this.width + 30 <= window.innerWidth * .8) {
 			this.width += 30;
 		}
-		console.log(this.width);
 		this.frame.style.width = `${this.width}px`;
 	}
 
 	setHeight() {
 		this.height = 0;
-		const wHeight = this.wrapper.clientHeight;
-		console.log(wHeight);
-		while (this.height + 30 <= wHeight) {
+		while (this.height + 30 <= window.innerHeight * .6) {
 			this.height += 30;
 		}
 		this.frame.style.height = `${this.height}px`;
@@ -85,7 +81,9 @@ class Apple {
 		public frame: SnakeFrame,
 		public snake: Snake,
 		public frameDiv: HTMLDivElement
-	) {}
+	) {
+		this.fruit.classList.add('apple');
+	}
 
 	setNewPosition() {
 		const snakeTranslateStyles = this.snake.body.map(el => el.style.transform);
@@ -103,31 +101,30 @@ class SnakeMovement {
 	directionModifier: number = 0;
 	direction: number = 0;
 	hasSwitchedSides = false;
-	interval: any;
-	lastKeyEvent = '';
+	interval: any;	
+	eventIdentifier: string = ''
 
 	constructor(
 		public frame: SnakeFrame,
 		public snake: Snake,
-		public apple: Apple
+		public apple: Apple,
 	) {}
 
-	movementHandler(event: KeyboardEvent) {
+	movementHandler(event: KeyboardEvent | Event) {
 		let status: string | null = null;
-		const isNewMovement = this.setDirection(event);
+		this.setDirection(event);
 		this.interval = setInterval(() => {
-			if (isNewMovement) {
-				switch (true) {
-					case event.key === 'ArrowLeft' || event.key === 'ArrowRight':
-						this.horizontalMovement();
-						break;
-					case event.key === 'ArrowUp' || event.key === 'ArrowDown':
-						this.verticalMovement();
-						break;
-				}
+			switch (true) {
+				case this.eventIdentifier === 'ArrowLeft' || this.eventIdentifier === 'ArrowRight':
+					this.horizontalMovement();
+					break;
+				case this.eventIdentifier === 'ArrowUp' || this.eventIdentifier === 'ArrowDown':
+					this.verticalMovement();
+					break;
 			}
 
 			this.updatePosition();
+
 			for (let i = this.snake.body.length - 1; i > 0; i--) {
 				this.snake.body[i].style.transform =
 					this.snake.body[i - 1].style.transform;
@@ -157,27 +154,20 @@ class SnakeMovement {
 		return;
 	}
 
-	setDirection(event: KeyboardEvent) {
-		let previousDirection = this.directionModifier;
-		let keyboardEvent = event.key;
-		if (keyboardEvent === 'ArrowLeft' || keyboardEvent === 'ArrowUp') {
+	setDirection(event: KeyboardEvent | Event) {
+		if (event instanceof KeyboardEvent) {
+			this.eventIdentifier = event.key
+		} else {
+			const target = event.target as HTMLButtonElement
+			this.eventIdentifier = target.dataset.event as string
+		}
+		if (this.eventIdentifier === 'ArrowLeft' || this.eventIdentifier === 'ArrowUp') {
 			this.directionModifier = -1;
 			clearInterval(this.interval);
-		} else if (
-			keyboardEvent === 'ArrowRight' ||
-			keyboardEvent === 'ArrowDown'
-		) {
+		} else if (this.eventIdentifier === 'ArrowRight' || this.eventIdentifier === 'ArrowDown') {
 			this.directionModifier = 1;
 			clearInterval(this.interval);
 		}
-		if (
-			keyboardEvent.includes('Arrow') &&
-			previousDirection === this.directionModifier &&
-			keyboardEvent === this.lastKeyEvent
-		) {
-			return false;
-		}
-		return true;
 	}
 
 	verticalMovement() {
@@ -246,8 +236,8 @@ export default class SnakeGame {
 	snake: Snake;
 	apple: Apple;
 	movement: SnakeMovement;
-	constructor(public wrapper: HTMLDivElement, public frameDiv: HTMLDivElement) {
-		this.frame = new SnakeFrame(this.wrapper, this.frameDiv);
+	constructor(public frameDiv: HTMLDivElement) {
+		this.frame = new SnakeFrame(this.frameDiv);
 		this.frame.setSize();
 		this.snake = new Snake(this.frame, frameDiv);
 		this.apple = new Apple(this.frame, this.snake, frameDiv);

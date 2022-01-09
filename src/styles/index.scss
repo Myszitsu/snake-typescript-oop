@@ -24,6 +24,7 @@ body {
 }
 
 .frame {
+	grid-row: span 1;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -116,4 +117,26 @@ body {
 	display: block;
 }
 
+.wrapper {
+	width: 80vw;
+	height: 80%;
+	background-color: blue;
+	display: grid;
+}
+
+.buttons {
+	grid-row: span 1;
+	align-self: start;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+
+	button {
+		padding-block: 10px;
+		width: 20%;
+		max-width: 100px;
+		cursor: pointer;
+	}
+}
 
