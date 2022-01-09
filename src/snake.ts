@@ -6,7 +6,7 @@ class SnakeFrame {
 
 	setWidth() {
 		this.width = 0;
-		while (this.width + 30 <= window.innerWidth * .8) {
+		while (this.width + 30 <= window.innerWidth * 0.8) {
 			this.width += 30;
 		}
 		this.frame.style.width = `${this.width}px`;
@@ -14,7 +14,7 @@ class SnakeFrame {
 
 	setHeight() {
 		this.height = 0;
-		while (this.height + 30 <= window.innerHeight * .6) {
+		while (this.height + 30 <= window.innerHeight * 0.6) {
 			this.height += 30;
 		}
 		this.frame.style.height = `${this.height}px`;
@@ -98,24 +98,41 @@ class Apple {
 
 class SnakeMovement {
 	isMovementFinished = true;
-	directionModifier: number = 0;
-	direction: number = 0;
+	direction: number = 1;
 	hasSwitchedSides = false;
-	interval: any;	
-	eventIdentifier: string = ''
+	interval: any;
+	eventIdentifier = 'ArrowRight'
+	status: string = ''
 
 	constructor(
 		public frame: SnakeFrame,
 		public snake: Snake,
-		public apple: Apple,
+		public apple: Apple
 	) {}
 
-	movementHandler(event: KeyboardEvent | Event) {
-		let status: string | null = null;
-		this.setDirection(event);
+	pause() {
+		clearInterval(this.interval)
+		setTimeout(() => {
+			this.isMovementFinished = true			
+		}, 50);
+	}
+
+	play() {
+		this.pause()
+		setTimeout(() => {
+			this.movementHandler()
+		}, 50);
+	}
+
+	movementHandler(event?: KeyboardEvent | Event) {
+		if (event) {
+			this.setDirection(event);
+			clearInterval(this.interval)
+		}
 		this.interval = setInterval(() => {
 			switch (true) {
-				case this.eventIdentifier === 'ArrowLeft' || this.eventIdentifier === 'ArrowRight':
+				case this.eventIdentifier === 'ArrowLeft' ||
+					this.eventIdentifier === 'ArrowRight':
 					this.horizontalMovement();
 					break;
 				case this.eventIdentifier === 'ArrowUp' || this.eventIdentifier === 'ArrowDown':
@@ -136,90 +153,77 @@ class SnakeMovement {
 			) {
 				this.snake.grow();
 				this.apple.setNewPosition();
-				status = 'apple';
+				this.status = 'apple';
 			}
 
 			for (let i = this.snake.body.length - 1; i > 1; i--) {
 				if (
 					this.snake.body[i].style.transform === this.snake.head.style.transform
 				) {
-					status = 'snake';
+					this.status = 'snake';
 				}
 			}
 			this.isMovementFinished = true;
 		}, 50);
-		if (status) {
-			return status;
-		}
-		return;
 	}
 
 	setDirection(event: KeyboardEvent | Event) {
 		if (event instanceof KeyboardEvent) {
-			this.eventIdentifier = event.key
+			this.eventIdentifier = event.key;
 		} else {
-			const target = event.target as HTMLButtonElement
-			this.eventIdentifier = target.dataset.event as string
+			const target = event.target as HTMLButtonElement;
+			this.eventIdentifier = target.dataset.event as string;
 		}
+
 		if (this.eventIdentifier === 'ArrowLeft' || this.eventIdentifier === 'ArrowUp') {
-			this.directionModifier = -1;
-			clearInterval(this.interval);
-		} else if (this.eventIdentifier === 'ArrowRight' || this.eventIdentifier === 'ArrowDown') {
-			this.directionModifier = 1;
-			clearInterval(this.interval);
+			this.direction = -1;
+		} else if (
+			this.eventIdentifier === 'ArrowRight' ||
+			this.eventIdentifier === 'ArrowDown'
+		) {
+			this.direction = 1;
 		}
 	}
 
 	verticalMovement() {
-		if (this.snake.body.length > 1) {
-			if (
-				this.snake.position.y + 15 * this.directionModifier ===
-					this.snake.getPosition(this.snake.body[1]).y ||
-				(this.hasSwitchedSides && this.direction === this.directionModifier)
-			) {
-				this.directionModifier *= -1;
-			}
+		const position = this.snake.getPosition(this.snake.head);
+		if (this.snake.body.length > 1 && position.y + 15 * this.direction === this.snake.getPosition(this.snake.body[1]).y) {
+			this.direction *= -1;
 		}
-		this.snake.position.y += 15 * this.directionModifier;
+
+		this.snake.position.y += 15 * this.direction;
 	}
 
 	horizontalMovement() {
-		if (this.snake.body.length > 1) {
-			if (
-				this.snake.position.x + 15 * this.directionModifier ===
-					this.snake.getPosition(this.snake.body[1]).x ||
-				(this.hasSwitchedSides && this.direction === this.directionModifier)
-			) {
-				this.directionModifier *= -1;
-			}
+		const position = this.snake.getPosition(this.snake.head);
+		if (this.snake.body.length > 1 && position.x + 15 * this.direction === this.snake.getPosition(this.snake.body[1]).x) {
+			this.direction *= -1;
 		}
-		this.snake.position.x += 15 * this.directionModifier;
+		this.snake.position.x += 15 * this.direction;
 	}
 
 	updatePosition() {
 		const position = this.snake.getPosition(this.snake.head);
 		const switchSides = () =>
 			(this.snake.head.style.transform = `translate(${position.x}px, ${position.y}px)`);
-		const modifyDirection = () => (this.direction = -this.directionModifier);
 
 		switch (true) {
-			case position.x + 15 === this.frame.width && this.directionModifier > 0:
+			case position.x === this.frame.width - 15 && this.direction > 0:
 				this.snake.position.x = 0;
 				switchSides();
 				this.hasSwitchedSides = true;
 				break;
-			case position.x === 0 && this.directionModifier < 0:
+			case position.x === 0 && this.direction < 0:
 				this.snake.position.x = this.frame.width - 15;
 				switchSides();
-				modifyDirection;
 				this.hasSwitchedSides = true;
 				break;
-			case position.y + 15 === this.frame.height && this.directionModifier > 0:
+			case position.y === this.frame.height -15 && this.direction > 0:
 				this.snake.position.y = 0;
 				switchSides();
 				this.hasSwitchedSides = true;
 				break;
-			case position.y === 0 && this.directionModifier < 0:
+			case position.y === 0 && this.direction < 0:
 				this.snake.position.y = this.frame.height - 15;
 				switchSides();
 				this.hasSwitchedSides = true;

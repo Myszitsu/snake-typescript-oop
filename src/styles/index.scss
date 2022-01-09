@@ -137,6 +137,10 @@ body {
 		width: 20%;
 		max-width: 100px;
 		cursor: pointer;
+
+		i {
+			pointer-events: none;
+		}
 	}
 }
 
