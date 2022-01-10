@@ -16,8 +16,8 @@ function movementHandler(event: KeyboardEvent | Event) {
 		event instanceof KeyboardEvent &&
 		event.key.includes('Arrow') &&
 		game.movement.isMovementFinished &&
-		event.key !== game.movement.eventIdentifier &&
-		!game.movement.isPaused
+		(event.key !== game.movement.eventIdentifier ||
+		game.movement.isPaused)
 	) {
 		game.movement.isMovementFinished = false;
 		game.movement.movementHandler(event);
@@ -26,8 +26,8 @@ function movementHandler(event: KeyboardEvent | Event) {
 		event.target instanceof HTMLButtonElement &&
 		event.target.dataset.event &&
 		game.movement.isMovementFinished &&
-		event.target.dataset.event !== game.movement.eventIdentifier &&
-		!game.movement.isPaused
+		(event.target.dataset.event !== game.movement.eventIdentifier ||
+		game.movement.isPaused)
 	) {
 		game.movement.isMovementFinished = false;
 		game.movement.movementHandler(event);
